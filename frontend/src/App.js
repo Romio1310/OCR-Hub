@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Tesseract from 'tesseract.js';
+import * as pdfjsLib from 'pdfjs-dist';
 import { Camera, Upload, Copy, Download, FileText, Loader, CheckCircle, XCircle, Image as ImageIcon, ArrowDown } from 'lucide-react';
 import FeatureSection from './components/FeatureSection';
 import HowItWorks from './components/HowItWorks';
