@@ -43,11 +43,56 @@ Visit the live application: [OCR Hub](https://ocrhub.preview.emergentagent.com)
 
 - **Frontend**: React 19.0.0
 - **OCR Engine**: Tesseract.js 6.0.1
+- **PDF Processing**: PDF.js 5.4.296
 - **Styling**: Tailwind CSS 3.4.18
 - **File Handling**: React Dropzone 14.3.8
 - **Icons**: Lucide React 0.507.0
 - **Build Tool**: Create React App with CRACO
 - **Backend**: FastAPI (for potential future enhancements)
+
+## ⚡ Quick Start
+
+### Prerequisites
+- Node.js 16+ and npm
+- Modern web browser with JavaScript enabled
+
+### Installation
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Romio1310/OCR-Hub.git
+   cd OCR-Hub
+   ```
+
+2. **Install dependencies**
+   ```bash
+   cd frontend
+   npm install --legacy-peer-deps
+   ```
+
+3. **Start development server**
+   ```bash
+   npm start
+   ```
+
+4. **Open in browser**
+   ```
+   http://localhost:3000
+   ```
+
+### Production Build
+```bash
+cd frontend
+npm run build
+```
+
+## 🚀 Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Romio1310/OCR-Hub)
+
+Or manually:
+1. Fork this repository
+2. Connect to Vercel
+3. Deploy automatically with zero configuration
 
 ## 🤝 Contributing to Welltoodit
 

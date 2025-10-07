@@ -23,13 +23,47 @@ const OCRHub = () => {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
 
-  // Configure PDF.js worker with fallback
-  try {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
-  } catch (error) {
-    // Fallback to Mozilla CDN
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
-  }
+  // Configure PDF.js worker with robust fallback system
+  const configurePDFWorker = () => {
+    const version = pdfjsLib.version;
+    
+    // Multiple CDN options as fallbacks, starting with local file
+    const workerUrls = [
+      // Local fallback first (most reliable)
+      `/pdf.worker.min.js`,
+      // Try different CDN patterns
+      `https://mozilla.github.io/pdf.js/build/pdf.worker.js`,
+      `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`,
+      `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`,
+    ];
+    
+    // Try each URL until one works
+    let currentIndex = 0;
+    const tryNextWorker = () => {
+      if (currentIndex >= workerUrls.length) {
+        console.error('All PDF.js worker URLs failed');
+        return false;
+      }
+      
+      const workerUrl = workerUrls[currentIndex];
+      pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+      console.log(`Configuring PDF.js worker (${currentIndex + 1}/${workerUrls.length}):`, workerUrl);
+      currentIndex++;
+      return true;
+    };
+    
+    // Start with first URL (local file)
+    tryNextWorker();
+    
+    // Store fallback function for later use
+    window.pdfWorkerFallback = tryNextWorker;
+    
+    // Return the current worker URL for reference
+    return pdfjsLib.GlobalWorkerOptions.workerSrc;
+  };
+  
+  const currentWorker = configurePDFWorker();
+  console.log('PDF.js initialized with worker:', currentWorker);
 
   // Show notification helper
   const showNotification = (message, type = 'success') => {
@@ -110,11 +144,20 @@ const OCRHub = () => {
   // Convert PDF to images
   const convertPdfToImages = async (file) => {
     try {
+      console.log('Starting PDF conversion for:', file.name);
+      
       const arrayBuffer = await file.arrayBuffer();
+      console.log('PDF loaded, size:', arrayBuffer.byteLength, 'bytes');
+      
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+      console.log('PDF parsed successfully, pages:', pdf.numPages);
+      
       const images = [];
+      const maxPages = Math.min(pdf.numPages, 5); // Limit to 5 pages for performance
 
-      for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 5); pageNum++) { // Limit to 5 pages
+      for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+        console.log(`Processing page ${pageNum}/${maxPages}`);
+        
         const page = await pdf.getPage(pageNum);
         const scale = 2.0; // Higher scale for better OCR accuracy
         const viewport = page.getViewport({ scale });
@@ -124,26 +167,110 @@ const OCRHub = () => {
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
+        // Render PDF page to canvas
         await page.render({
           canvasContext: context,
           viewport: viewport
         }).promise;
 
         // Convert canvas to blob
-        const blob = await new Promise(resolve => {
-          canvas.toBlob(resolve, 'image/jpeg', 0.95);
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to convert canvas to blob'));
+            }
+          }, 'image/jpeg', 0.95);
         });
         
         images.push({
           blob,
           pageNumber: pageNum
         });
+        
+        // Clean up canvas
+        canvas.remove();
       }
 
+      console.log(`PDF conversion completed: ${images.length} images generated`);
       return images;
+      
     } catch (error) {
       console.error('PDF conversion error:', error);
-      throw new Error('Failed to convert PDF to images');
+      
+      // Check if it's a worker-related error and try fallback
+      if (error.message.includes('Failed to fetch dynamically imported module') || 
+          error.message.includes('Worker') || 
+          error.message.includes('Setting up fake worker')) {
+        
+        console.log('Worker error detected, trying fallback...');
+        
+        // Try fallback worker if available
+        if (window.pdfWorkerFallback) {
+          try {
+            window.pdfWorkerFallback();
+            console.log('Retrying with fallback worker...');
+            
+            // Retry the conversion with new worker
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            const images = [];
+            const maxPages = Math.min(pdf.numPages, 5);
+
+            for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+              const page = await pdf.getPage(pageNum);
+              const scale = 2.0;
+              const viewport = page.getViewport({ scale });
+
+              const canvas = document.createElement('canvas');
+              const context = canvas.getContext('2d');
+              canvas.height = viewport.height;
+              canvas.width = viewport.width;
+
+              await page.render({
+                canvasContext: context,
+                viewport: viewport
+              }).promise;
+
+              const blob = await new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                  if (blob) {
+                    resolve(blob);
+                  } else {
+                    reject(new Error('Failed to convert canvas to blob'));
+                  }
+                }, 'image/jpeg', 0.95);
+              });
+              
+              images.push({
+                blob,
+                pageNumber: pageNum
+              });
+              
+              canvas.remove();
+            }
+
+            console.log(`PDF conversion completed with fallback: ${images.length} images generated`);
+            return images;
+            
+          } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+            throw new Error('PDF processing service is currently unavailable. Please try again later or use a different browser.');
+          }
+        }
+      }
+      
+      // Provide specific error messages for other types of errors
+      if (error.name === 'PasswordException') {
+        throw new Error('PDF is password protected. Please use an unprotected PDF.');
+      } else if (error.name === 'InvalidPDFException') {
+        throw new Error('Invalid or corrupted PDF file. Please try a different file.');
+      } else if (error.message.includes('Failed to fetch dynamically imported module')) {
+        throw new Error('PDF processing service is temporarily unavailable. Please check your internet connection and try again.');
+      } else {
+        throw new Error(`Failed to convert PDF to images: ${error.message}`);
+      }
     }
   };
 
@@ -162,6 +289,10 @@ const OCRHub = () => {
         showNotification('Converting PDF to images...', 'info');
         const pdfImages = await convertPdfToImages(file);
         imagesToProcess = pdfImages.map(img => img.blob);
+        
+        if (pdfImages.length > 1) {
+          showNotification(`Processing ${pdfImages.length} pages from PDF...`, 'info');
+        }
       } else {
         imagesToProcess = [file];
       }
@@ -171,6 +302,11 @@ const OCRHub = () => {
 
       for (let i = 0; i < imagesToProcess.length; i++) {
         const image = imagesToProcess[i];
+        
+        // Update progress - only show page notification for first and every 2nd page to avoid spam
+        if (file.type === 'application/pdf' && totalImages > 1 && (i === 0 || (i + 1) % 2 === 0)) {
+          showNotification(`Processing page ${i + 1} of ${totalImages}...`, 'info');
+        }
         
         setProgress(Math.round((i / totalImages) * 90)); // Reserve 10% for final processing
         
