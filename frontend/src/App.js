@@ -233,12 +233,62 @@ const ImageToTextConverter = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upload Section */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload Image</h2>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Convert Images to Text
+            <span className="block text-blue-200">Instantly & Free</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Extract text from images, receipts, documents, and handwritten notes using our powerful OCR technology. Works on any device, completely free.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={scrollToUpload}
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
+              data-testid="get-started-btn"
+            >
+              <Upload className="w-5 h-5" />
+              <span>Get Started Free</span>
+            </button>
+            <button
+              onClick={scrollToUpload}
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors flex items-center justify-center space-x-2"
+            >
+              <ArrowDown className="w-5 h-5" />
+              <span>See How It Works</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <FeatureSection />
+
+      {/* How It Works */}
+      <HowItWorks />
+
+      {/* Demo Section */}
+      <DemoSection onScrollToUpload={scrollToUpload} />
+
+      {/* Main Upload Section */}
+      <div id="upload-section" className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Start Converting Images to Text
+            </h2>
+            <p className="text-xl text-gray-600">
+              Upload your image and get accurate text extraction in seconds
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Upload Section */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Image</h3>
               
               {/* Upload Methods */}
               <div className="space-y-4">
