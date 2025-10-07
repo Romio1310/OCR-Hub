@@ -435,14 +435,22 @@ const OCRHub = () => {
                       </div>
                     </div>
                     
-                    {selectedFile.type.startsWith('image/') && (
+                    {selectedFile.type.startsWith('image/') ? (
                       <img
                         src={URL.createObjectURL(selectedFile)}
                         alt="Preview"
                         className="mt-3 max-w-full h-48 object-contain rounded-lg bg-gray-100"
                         data-testid="image-preview"
                       />
-                    )}
+                    ) : selectedFile.type === 'application/pdf' ? (
+                      <div className="mt-3 flex items-center justify-center h-48 bg-red-50 rounded-lg border-2 border-dashed border-red-200">
+                        <div className="text-center">
+                          <FileText className="w-12 h-12 text-red-400 mx-auto mb-2" />
+                          <p className="text-red-600 font-medium">PDF Document</p>
+                          <p className="text-red-500 text-sm">Ready for text extraction</p>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 )}
 
