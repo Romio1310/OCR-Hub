@@ -155,6 +155,14 @@ const ImageToTextConverter = () => {
     showNotification('Text file downloaded successfully!');
   };
 
+  // Scroll to upload section
+  const scrollToUpload = () => {
+    const uploadElement = document.getElementById('upload-section');
+    if (uploadElement) {
+      uploadElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
