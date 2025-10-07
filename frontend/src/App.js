@@ -102,6 +102,46 @@ const OCRHub = () => {
     setShowCamera(false);
   };
 
+  // Convert PDF to images
+  const convertPdfToImages = async (file) => {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+      const images = [];
+
+      for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 5); pageNum++) { // Limit to 5 pages
+        const page = await pdf.getPage(pageNum);
+        const scale = 2.0; // Higher scale for better OCR accuracy
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({
+          canvasContext: context,
+          viewport: viewport
+        }).promise;
+
+        // Convert canvas to blob
+        const blob = await new Promise(resolve => {
+          canvas.toBlob(resolve, 'image/jpeg', 0.95);
+        });
+        
+        images.push({
+          blob,
+          pageNumber: pageNum
+        });
+      }
+
+      return images;
+    } catch (error) {
+      console.error('PDF conversion error:', error);
+      throw new Error('Failed to convert PDF to images');
+    }
+  };
+
   // Image processing with Tesseract.js
   const processImage = async (file) => {
     if (!file) return;
@@ -111,31 +151,65 @@ const OCRHub = () => {
     setExtractedText('');
 
     try {
-      const result = await Tesseract.recognize(file, 'eng', {
-        logger: ({ status, progress: progressValue }) => {
-          if (status === 'recognizing text') {
-            setProgress(Math.round(progressValue * 100));
+      let imagesToProcess = [];
+      
+      if (file.type === 'application/pdf') {
+        showNotification('Converting PDF to images...', 'info');
+        const pdfImages = await convertPdfToImages(file);
+        imagesToProcess = pdfImages.map(img => img.blob);
+      } else {
+        imagesToProcess = [file];
+      }
+
+      let allText = '';
+      const totalImages = imagesToProcess.length;
+
+      for (let i = 0; i < imagesToProcess.length; i++) {
+        const image = imagesToProcess[i];
+        
+        setProgress(Math.round((i / totalImages) * 90)); // Reserve 10% for final processing
+        
+        const result = await Tesseract.recognize(image, 'eng', {
+          logger: ({ status, progress: progressValue }) => {
+            if (status === 'recognizing text') {
+              const overallProgress = ((i / totalImages) * 90) + (progressValue * 90 / totalImages);
+              setProgress(Math.round(overallProgress));
+            }
+          }
+        });
+
+        const pageText = result.data.text.trim();
+        if (pageText) {
+          if (file.type === 'application/pdf' && imagesToProcess.length > 1) {
+            allText += `--- Page ${i + 1} ---\n${pageText}\n\n`;
+          } else {
+            allText += pageText;
           }
         }
-      });
+      }
 
-      const text = result.data.text.trim();
-      setExtractedText(text);
+      setProgress(100);
+      
+      if (!allText.trim()) {
+        throw new Error('No text found in the document');
+      }
+
+      setExtractedText(allText.trim());
       
       // Add to history
       const historyItem = {
         id: Date.now(),
         fileName: file.name,
-        text: text,
+        text: allText.trim(),
         timestamp: new Date().toLocaleString(),
-        imageUrl: URL.createObjectURL(file)
+        imageUrl: file.type === 'application/pdf' ? null : URL.createObjectURL(file)
       };
       setHistory(prev => [historyItem, ...prev.slice(0, 9)]); // Keep last 10 items
       
       showNotification('Text extraction completed successfully!');
     } catch (error) {
       console.error('OCR Error:', error);
-      showNotification('Failed to extract text from image', 'error');
+      showNotification(error.message || 'Failed to extract text from document', 'error');
     } finally {
       setIsProcessing(false);
       setProgress(0);
