@@ -439,7 +439,7 @@ const ImageToTextConverter = () => {
             {/* History Section */}
             {history.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm border p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Extractions</h2>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Extractions</h3>
                 <div className="space-y-3 max-h-64 overflow-y-auto" data-testid="history-list">
                   {history.map((item) => (
                     <div key={item.id} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
