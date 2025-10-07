@@ -22,7 +22,7 @@ const Footer = () => {
           
           <div className="flex items-center space-x-6">
             <a
-              href="https://github.com/Itsabhishek7py/Welltoodit/issues/34"
+              href="https://github.com/Romio1310"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
@@ -34,7 +34,7 @@ const Footer = () => {
             <div className="flex items-center space-x-1 text-gray-400">
               <span>Made with</span>
               <Heart className="w-4 h-4 text-red-500" />
-              <span>for Welltoodit</span>
+              <span>for Welltoodit by Romio1310</span>
             </div>
           </div>
         </div>
