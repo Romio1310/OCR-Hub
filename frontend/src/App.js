@@ -23,8 +23,13 @@ const OCRHub = () => {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
 
-  // Configure PDF.js worker - use the correct CDN URL
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+  // Configure PDF.js worker with fallback
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+  } catch (error) {
+    // Fallback to Mozilla CDN
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+  }
 
   // Show notification helper
   const showNotification = (message, type = 'success') => {
