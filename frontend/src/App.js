@@ -1,7 +1,11 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Tesseract from 'tesseract.js';
-import { Camera, Upload, Copy, Download, FileText, Loader, CheckCircle, XCircle, Image as ImageIcon } from 'lucide-react';
+import { Camera, Upload, Copy, Download, FileText, Loader, CheckCircle, XCircle, Image as ImageIcon, ArrowDown } from 'lucide-react';
+import FeatureSection from './components/FeatureSection';
+import HowItWorks from './components/HowItWorks';
+import DemoSection from './components/DemoSection';
+import Footer from './components/Footer';
 import './App.css';
 
 const ImageToTextConverter = () => {
