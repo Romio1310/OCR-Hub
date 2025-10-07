@@ -263,10 +263,16 @@ const OCRHub = () => {
       {/* Notification */}
       {notification.show && (
         <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-2 ${
-          notification.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+          notification.type === 'error' 
+            ? 'bg-red-500 text-white' 
+            : notification.type === 'info'
+            ? 'bg-blue-500 text-white'
+            : 'bg-green-500 text-white'
         }`}>
           {notification.type === 'error' ? (
             <XCircle className="w-5 h-5" />
+          ) : notification.type === 'info' ? (
+            <Loader className="w-5 h-5 animate-spin" />
           ) : (
             <CheckCircle className="w-5 h-5" />
           )}
