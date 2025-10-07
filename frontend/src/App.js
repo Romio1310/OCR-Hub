@@ -23,6 +23,9 @@ const OCRHub = () => {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
 
+  // Configure PDF.js worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
   // Show notification helper
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
