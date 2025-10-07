@@ -479,6 +479,9 @@ const ImageToTextConverter = () => {
         </div>
       </div>
 
+      {/* Footer */}
+      <Footer />
+
       {/* Hidden file input */}
       <input
         type="file"
