@@ -8,7 +8,7 @@ import DemoSection from './components/DemoSection';
 import Footer from './components/Footer';
 import './App.css';
 
-const ImageToTextConverter = () => {
+const OCRHub = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [extractedText, setExtractedText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,6 +26,14 @@ const ImageToTextConverter = () => {
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
     setTimeout(() => setNotification({ show: false, message: '', type: '' }), 3000);
+  };
+
+  // Scroll to upload section
+  const scrollToUpload = () => {
+    const uploadElement = document.getElementById('upload-section');
+    if (uploadElement) {
+      uploadElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // File upload handler
@@ -155,14 +163,6 @@ const ImageToTextConverter = () => {
     showNotification('Text file downloaded successfully!');
   };
 
-  // Scroll to upload section
-  const scrollToUpload = () => {
-    const uploadElement = document.getElementById('upload-section');
-    if (uploadElement) {
-      uploadElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -289,192 +289,193 @@ const ImageToTextConverter = () => {
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Image</h3>
-              
-              {/* Upload Methods */}
-              <div className="space-y-4">
-                {/* Drag & Drop Area */}
-                <div
-                  {...getRootProps()}
-                  className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                    isDragActive
-                      ? 'border-blue-400 bg-blue-50'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  data-testid="dropzone-area"
-                >
-                  <input {...getInputProps()} data-testid="file-input" />
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-lg font-medium text-gray-900 mb-2">
-                    {isDragActive ? 'Drop image here...' : 'Drag & drop an image'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Or click to browse files (PNG, JPG, PDF supported)
-                  </p>
+                
+                {/* Upload Methods */}
+                <div className="space-y-4">
+                  {/* Drag & Drop Area */}
+                  <div
+                    {...getRootProps()}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                      isDragActive
+                        ? 'border-blue-400 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    data-testid="dropzone-area"
+                  >
+                    <input {...getInputProps()} data-testid="file-input" />
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-lg font-medium text-gray-900 mb-2">
+                      {isDragActive ? 'Drop image here...' : 'Drag & drop an image'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Or click to browse files (PNG, JPG, PDF supported)
+                    </p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+                      data-testid="browse-files-btn"
+                    >
+                      <Upload className="w-5 h-5" />
+                      <span>Browse Files</span>
+                    </button>
+                    
+                    <button
+                      onClick={startCamera}
+                      className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+                      data-testid="camera-btn"
+                    >
+                      <Camera className="w-5 h-5" />
+                      <span>Camera</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors"
-                    data-testid="browse-files-btn"
-                  >
-                    <Upload className="w-5 h-5" />
-                    <span>Browse Files</span>
-                  </button>
-                  
-                  <button
-                    onClick={startCamera}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors"
-                    data-testid="camera-btn"
-                  >
-                    <Camera className="w-5 h-5" />
-                    <span>Camera</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Selected File Preview */}
-              {selectedFile && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg" data-testid="file-preview">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-blue-100 p-2 rounded-lg">
-                      <ImageIcon className="w-5 h-5 text-blue-600" />
+                {/* Selected File Preview */}
+                {selectedFile && (
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg" data-testid="file-preview">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-blue-100 p-2 rounded-lg">
+                        <ImageIcon className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 truncate">
+                          {selectedFile.name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
-                        {selectedFile.name}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
+                    
+                    {selectedFile.type.startsWith('image/') && (
+                      <img
+                        src={URL.createObjectURL(selectedFile)}
+                        alt="Preview"
+                        className="mt-3 max-w-full h-48 object-contain rounded-lg bg-gray-100"
+                        data-testid="image-preview"
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* Processing Progress */}
+                {isProcessing && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg" data-testid="processing-indicator">
+                    <div className="flex items-center space-x-3">
+                      <Loader className="w-5 h-5 text-blue-600 animate-spin" />
+                      <div className="flex-1">
+                        <p className="font-medium text-blue-900">Processing Image...</p>
+                        <div className="mt-2 bg-blue-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <p className="text-sm text-blue-700 mt-1">{progress}% Complete</p>
+                      </div>
                     </div>
                   </div>
-                  
-                  {selectedFile.type.startsWith('image/') && (
-                    <img
-                      src={URL.createObjectURL(selectedFile)}
-                      alt="Preview"
-                      className="mt-3 max-w-full h-48 object-contain rounded-lg bg-gray-100"
-                      data-testid="image-preview"
-                    />
+                )}
+              </div>
+            </div>
+
+            {/* Results Section */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Extracted Text</h3>
+                  {extractedText && (
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => copyToClipboard(extractedText)}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
+                        data-testid="copy-text-btn"
+                      >
+                        <Copy className="w-4 h-4" />
+                        <span>Copy</span>
+                      </button>
+                      <button
+                        onClick={() => downloadText(extractedText)}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
+                        data-testid="download-text-btn"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download</span>
+                      </button>
+                    </div>
                   )}
                 </div>
-              )}
-
-              {/* Processing Progress */}
-              {isProcessing && (
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg" data-testid="processing-indicator">
-                  <div className="flex items-center space-x-3">
-                    <Loader className="w-5 h-5 text-blue-600 animate-spin" />
-                    <div className="flex-1">
-                      <p className="font-medium text-blue-900">Processing Image...</p>
-                      <div className="mt-2 bg-blue-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        />
+                
+                <div className="border rounded-lg p-4 bg-gray-50 min-h-[300px]">
+                  {extractedText ? (
+                    <div>
+                      <textarea
+                        value={extractedText}
+                        onChange={(e) => setExtractedText(e.target.value)}
+                        className="w-full h-64 p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Extracted text will appear here..."
+                        data-testid="extracted-text-area"
+                      />
+                      <div className="mt-2 flex justify-between text-sm text-gray-500">
+                        <span>Characters: {extractedText.length}</span>
+                        <span>Words: {extractedText.split(/\s+/).filter(word => word.length > 0).length}</span>
                       </div>
-                      <p className="text-sm text-blue-700 mt-1">{progress}% Complete</p>
                     </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-64 text-gray-500">
+                      <div className="text-center">
+                        <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <p>Upload an image to extract text</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* History Section */}
+              {history.length > 0 && (
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Extractions</h3>
+                  <div className="space-y-3 max-h-64 overflow-y-auto" data-testid="history-list">
+                    {history.map((item) => (
+                      <div key={item.id} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate">{item.fileName}</p>
+                            <p className="text-sm text-gray-500">{item.timestamp}</p>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                              {item.text.substring(0, 100)}...
+                            </p>
+                          </div>
+                          <div className="flex space-x-1 ml-3">
+                            <button
+                              onClick={() => copyToClipboard(item.text)}
+                              className="p-1 text-gray-400 hover:text-gray-600"
+                              title="Copy"
+                              data-testid={`copy-history-${item.id}`}
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => downloadText(item.text, `${item.fileName}_text.txt`)}
+                              className="p-1 text-gray-400 hover:text-gray-600"
+                              title="Download"
+                              data-testid={`download-history-${item.id}`}
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Results Section */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Extracted Text</h3>
-                {extractedText && (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => copyToClipboard(extractedText)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
-                      data-testid="copy-text-btn"
-                    >
-                      <Copy className="w-4 h-4" />
-                      <span>Copy</span>
-                    </button>
-                    <button
-                      onClick={() => downloadText(extractedText)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
-                      data-testid="download-text-btn"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>Download</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              <div className="border rounded-lg p-4 bg-gray-50 min-h-[300px]">
-                {extractedText ? (
-                  <div>
-                    <textarea
-                      value={extractedText}
-                      onChange={(e) => setExtractedText(e.target.value)}
-                      className="w-full h-64 p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Extracted text will appear here..."
-                      data-testid="extracted-text-area"
-                    />
-                    <div className="mt-2 flex justify-between text-sm text-gray-500">
-                      <span>Characters: {extractedText.length}</span>
-                      <span>Words: {extractedText.split(/\s+/).filter(word => word.length > 0).length}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-64 text-gray-500">
-                    <div className="text-center">
-                      <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>Upload an image to extract text</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* History Section */}
-            {history.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Extractions</h3>
-                <div className="space-y-3 max-h-64 overflow-y-auto" data-testid="history-list">
-                  {history.map((item) => (
-                    <div key={item.id} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{item.fileName}</p>
-                          <p className="text-sm text-gray-500">{item.timestamp}</p>
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                            {item.text.substring(0, 100)}...
-                          </p>
-                        </div>
-                        <div className="flex space-x-1 ml-3">
-                          <button
-                            onClick={() => copyToClipboard(item.text)}
-                            className="p-1 text-gray-400 hover:text-gray-600"
-                            title="Copy"
-                            data-testid={`copy-history-${item.id}`}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => downloadText(item.text, `${item.fileName}_text.txt`)}
-                            className="p-1 text-gray-400 hover:text-gray-600"
-                            title="Download"
-                            data-testid={`download-history-${item.id}`}
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -500,8 +501,4 @@ const ImageToTextConverter = () => {
   );
 };
 
-function App() {
-  return <ImageToTextConverter />;
-}
-
-export default App;
+export default OCRHub;
