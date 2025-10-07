@@ -1,0 +1,18 @@
+{
+  "short_name": "OCR Hub",
+  "name": "OCR Hub - Image to Text Converter",
+  "description": "Free, fast, and accurate OCR - Convert images and PDFs to text instantly",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#3B82F6",
+  "background_color": "#ffffff",
+  "categories": ["productivity", "utilities"]
+}
