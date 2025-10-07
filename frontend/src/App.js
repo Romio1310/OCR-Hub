@@ -387,7 +387,7 @@ const ImageToTextConverter = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Extracted Text</h2>
+                <h3 className="text-lg font-semibold text-gray-900">Extracted Text</h3>
                 {extractedText && (
                   <div className="flex space-x-2">
                     <button
